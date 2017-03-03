@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <style>
+    h1 {
+      text-align:center;
+    }
+    #NB, #EB, #SB, #WB {
+      float:left;
+      margin:40px;
+      background-color:#add8e6;
+      text-align:center;
+      width: 30%;
+      border: 3px solid #73AD21;
+      padding: 50px;
+    }
+  </style>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+ 
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+      <script>
+        /*global $*/
+        $("body").append("<h1>Bus Predictions</h1><div id='NB'></div><div id='EB'></div><div id='SB'></div><div id='WB'></div>");
+        function busUpdate() {
+          $(function() {
+          
+          
+            var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+          
+            var apiEndpoint = "http://ctabustracker.com/bustime/api/v2/getpredictions";
+          
+            $.ajax({
+                url: apiPassThruUrl,
+                dataType: "json",
+                method: 'GET',
+                data: {"apiEndpoint": apiEndpoint,
+                        "key" : "PMa8VbZhjaAzs2pJGGnqNMJyX",
+                        "rt" : "49,152",
+                        "stpid" : "12569,12527,8417,8195",
+                        "format":"json"}
+              }).done(function(data){
+                $("#NB, #EB, #SB, #WB").html("");
+                $.each(data["bustime-response"]["prd"], function(i,v){
+                    var time = parseInt(v.prdctdn);
+                    var addon = " Minutes<br>";
+                    var fulltime = time + addon;
+                    var setup = "Stop: " + v.stpnm + "<br>Destination: " + v.des + "<br>Time untill bus arrives: ";
+                    if (v.rtdir == "Northbound"){
+                      if (Number.isInteger(time) == false){
+                        $("#NB").append(setup + time + "<br>");
+                      }
+                      else {
+                        $("#NB").append(setup + fulltime);
+                      }
+                    }
+                    else if (v.rtdir == "Eastbound"){
+                      if (Number.isInteger(time) == false){
+                          $("#EB").append(setup + time + "<br>");
+                      }
+                      else {
+                        $("#EB").append(setup + fulltime);
+                      }
+                    }
+                    else if (v.rtdir == "Southbound"){
+                      if (Number.isInteger(time) == false){
+                        $("#SB").append(setup + time + "<br>");
+                      }
+                      else {
+                        $("#SB").append(setup + fulltime);
+                      }
+                    }
+                    else if (v.rtdir == "Westbound"){
+                      if (Number.isInteger(time) == false){
+                        $("#WB").append(setup + time + "<br>");
+                      }
+                      else {
+                        $("#WB").append(setup + fulltime);
+                      }
+                    }
+                  }
+                );
+            });
+          });
+          setTimeout(busUpdate, 3000);
+        }
+        busUpdate();
+</script>
+ 
+</body>
+</html>
